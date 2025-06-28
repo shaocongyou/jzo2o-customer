@@ -24,10 +24,7 @@ import com.jzo2o.common.utils.*;
 import com.jzo2o.customer.mapper.ServeProviderMapper;
 import com.jzo2o.customer.model.domain.*;
 import com.jzo2o.customer.model.dto.ServeSkillSimpleDTO;
-import com.jzo2o.customer.model.dto.request.InstitutionRegisterReqDTO;
-import com.jzo2o.customer.model.dto.request.InstitutionResetPasswordReqDTO;
-import com.jzo2o.customer.model.dto.request.ServePickUpReqDTO;
-import com.jzo2o.customer.model.dto.request.ServeProviderPageQueryReqDTO;
+import com.jzo2o.customer.model.dto.request.*;
 import com.jzo2o.customer.model.dto.response.CertificationStatusDTO;
 import com.jzo2o.customer.model.dto.response.ServeProviderBasicInformationResDTO;
 import com.jzo2o.customer.model.dto.response.ServeProviderInfoResDTO;
@@ -204,6 +201,23 @@ public class ServeProviderServiceImpl extends ServiceImpl<ServeProviderMapper, S
             AgencyCertification agencyCertification = agencyCertificationService.getById(providerId);
             return BeanUtil.toBean(agencyCertification,CertificationStatusDTO.class);
         }
+    }
+
+    @Override
+    public void institutionRegister(InstitutionRegisterReqDTO institutionRegisterReqDTO) {
+        // 1. 校验验证码是否为空
+        if(StringUtils.isEmpty(institutionRegisterReqDTO.getVerifyCode())){
+            throw new BadRequestException("验证码不能为空");
+        }
+
+        // 2. 校验验证码不为空，需要校验验证码是否正确
+        //远程调用publics服务校验验证码是否正确
+        boolean verifyResult = smsCodeApi.verify(institutionRegisterReqDTO.getPhone(), SmsBussinessTypeEnum.INSTITION_REGISTER, institutionRegisterReqDTO.getVerifyCode()).getIsSuccess();
+        if(!verifyResult) {
+            throw new BadRequestException("验证码错误，请重新获取");
+        }
+
+        owner.add(institutionRegisterReqDTO.getPhone(), UserType.INSTITUTION, passwordEncoder.encode(institutionRegisterReqDTO.getPassword()));
     }
 
     /**
