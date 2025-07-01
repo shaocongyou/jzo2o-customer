@@ -52,4 +52,13 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
         }
         return BeanUtils.copyToList(addressBooks, AddressBookResDTO.class);
     }
+
+    @Override
+    public PageResult<AddressBookResDTO> page(AddressBookPageQueryReqDTO addressBookPageQueryReqDTO) {
+        Page<AddressBook> page = PageUtils.parsePageQuery(addressBookPageQueryReqDTO,AddressBook.class);
+
+        LambdaQueryWrapper<AddressBook> wrapper = Wrappers.<AddressBook>lambdaQuery().eq(AddressBook::getUserId, UserContext.currentUserId());
+        Page<AddressBook> addressBookPage = baseMapper.selectPage(page, wrapper);
+        return PageUtils.toPage(addressBookPage, AddressBookResDTO.class);
+    }
 }
