@@ -220,6 +220,51 @@ public class ServeProviderServiceImpl extends ServiceImpl<ServeProviderMapper, S
         owner.add(institutionRegisterReqDTO.getPhone(), UserType.INSTITUTION, passwordEncoder.encode(institutionRegisterReqDTO.getPassword()));
     }
 
+    @Override
+    public void institutionResetPassword(InstitutionResetPasswordReqDTO institutionResetPasswordReqDTO) {
+        if(StringUtils.isEmpty(institutionResetPasswordReqDTO.getVerifyCode())){
+            throw new BadRequestException("验证码不能为空");
+        }
+
+        // 2. 校验验证码
+        boolean verifyResult = smsCodeApi.verify(
+                institutionResetPasswordReqDTO.getPhone(),
+                SmsBussinessTypeEnum.INSTITUTION_RESET_PASSWORD,
+                institutionResetPasswordReqDTO.getVerifyCode()
+        ).getIsSuccess();
+
+        if(!verifyResult) {
+            throw new BadRequestException("验证码错误，请重新获取");
+        }
+
+        // 3. 修改密码
+        updatePasswordByPhone(
+                institutionResetPasswordReqDTO.getPhone(),
+                passwordEncoder.encode(institutionResetPasswordReqDTO.getPassword())
+        );
+    }
+
+    @Override
+    public boolean updatePasswordByPhone(String phone, String encode) {
+        ServeProvider serveProvider = lambdaQuery()
+                .eq(ServeProvider::getPhone, phone)
+                .one();
+        if (serveProvider == null) {
+            throw new BadRequestException("该手机号有多名用户，请联系管理员");
+        }
+
+        boolean success = lambdaUpdate()
+                .eq(ServeProvider::getId, serveProvider.getId())
+                .set(ServeProvider::getPassword, encode)
+                .update();
+
+        if(!success) {
+            throw new BadRequestException("密码修改失败");
+        }
+
+        return true; // 或者直接去掉返回值，改为void方法
+    }
+
     /**
      * 根据服务人员/机构id查询基本信息
      *

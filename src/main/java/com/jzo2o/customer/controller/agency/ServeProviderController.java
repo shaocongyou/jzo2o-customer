@@ -32,4 +32,10 @@ public class ServeProviderController {
     public ServeProviderInfoResDTO currentUserInfo() {
         return serveProviderService.currentUserInfo();
     }
+
+    @PostMapping("/institution/resetPassword")
+    @ApiOperation("机构重置密码")
+    public void institutionResetPassword(@RequestBody InstitutionResetPasswordReqDTO institutionResetPasswordReqDTO) {
+        serveProviderService.institutionResetPassword(institutionResetPasswordReqDTO);
+    }
 }

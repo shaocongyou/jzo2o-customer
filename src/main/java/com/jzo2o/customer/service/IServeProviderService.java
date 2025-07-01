@@ -123,4 +123,8 @@ public interface IServeProviderService extends IService<ServeProvider> {
     CertificationStatusDTO getCertificationStatus(Integer userType, Long providerId);
 
     void institutionRegister(InstitutionRegisterReqDTO institutionRegisterReqDTO);
+
+    void institutionResetPassword(InstitutionResetPasswordReqDTO institutionResetPasswordReqDTO);
+
+    boolean updatePasswordByPhone(String phone, String encode);
 }
