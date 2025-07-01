@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.api.customer.dto.response.AddressBookResDTO;
 import com.jzo2o.api.publics.MapApi;
 import com.jzo2o.api.publics.dto.response.LocationResDTO;
+import com.jzo2o.common.expcetions.CommonException;
 import com.jzo2o.common.model.PageResult;
 import com.jzo2o.common.utils.BeanUtils;
 import com.jzo2o.common.utils.CollUtils;
@@ -40,6 +41,9 @@ import java.util.List;
 @Service
 public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, AddressBook> implements IAddressBookService {
 
+    @Resource
+    private MapApi mapApi;
+
     @Override
     public List<AddressBookResDTO> getByUserIdAndCity(Long userId, String city) {
 
@@ -60,5 +64,56 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
         LambdaQueryWrapper<AddressBook> wrapper = Wrappers.<AddressBook>lambdaQuery().eq(AddressBook::getUserId, UserContext.currentUserId());
         Page<AddressBook> addressBookPage = baseMapper.selectPage(page, wrapper);
         return PageUtils.toPage(addressBookPage, AddressBookResDTO.class);
+    }
+
+    @Override
+    public void add(AddressBookUpsertReqDTO addressBookUpsertReqDTO) {
+        Long userId = UserContext.currentUserId();
+
+        if(addressBookUpsertReqDTO.getIsDefault() == 1) {
+            // 如果是默认地址，需要把目前的所有地址设置为非默认
+            updateDefault(userId, 0);
+        }
+
+        AddressBook addressBook = BeanUtil.toBean(addressBookUpsertReqDTO, AddressBook.class);
+        addressBook.setUserId(userId);
+        //组装详细地址
+        String completeAddress = addressBookUpsertReqDTO.getProvince() +
+                addressBookUpsertReqDTO.getCity() +
+                addressBookUpsertReqDTO.getCounty() +
+                addressBookUpsertReqDTO.getAddress();
+
+        //如果请求体中没有经纬度，需要调用第三方api根据详细地址获取经纬度
+        if(ObjectUtil.isEmpty(addressBookUpsertReqDTO.getLocation())){
+            //远程请求高德获取经纬度
+            LocationResDTO locationDto = mapApi.getLocationByAddress(completeAddress);
+            //经纬度(字符串格式：经度,纬度),经度在前，纬度在后
+            String location = locationDto.getLocation();
+            addressBookUpsertReqDTO.setLocation(location);
+        }
+
+        if(StringUtils.isNotEmpty(addressBookUpsertReqDTO.getLocation())) {
+            // 经度
+            addressBook.setLon(NumberUtils.parseDouble(addressBookUpsertReqDTO.getLocation().split(",")[0]));
+            // 纬度
+            addressBook.setLat(NumberUtils.parseDouble(addressBookUpsertReqDTO.getLocation().split(",")[1]));
+        }
+        baseMapper.insert(addressBook);
+    }
+
+    private void updateDefault(Long userId, int i) {
+        Integer count = lambdaQuery()
+                .eq(AddressBook::getUserId, userId)
+                .count();
+        if(count > 0) {
+            // 如果有默认地址，需要把默认地址设置为非默认
+            boolean success = lambdaUpdate()
+                    .eq(AddressBook::getUserId, userId)
+                    .set(AddressBook::getIsDefault, i)
+                    .update();
+            if(!success) {
+                throw new CommonException("更新默认地址失败");
+            }
+        }
     }
 }

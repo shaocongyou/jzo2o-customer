@@ -29,4 +29,6 @@ public interface IAddressBookService extends IService<AddressBook> {
     List<AddressBookResDTO> getByUserIdAndCity(Long userId, String cityCode);
 
     PageResult<AddressBookResDTO> page(AddressBookPageQueryReqDTO addressBookPageQueryReqDTO);
+
+    void add(AddressBookUpsertReqDTO addressBookUpsertReqDTO);
 }

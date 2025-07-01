@@ -4,12 +4,11 @@ import com.jzo2o.api.customer.dto.response.AddressBookResDTO;
 import com.jzo2o.common.model.PageResult;
 import com.jzo2o.customer.model.domain.AddressBook;
 import com.jzo2o.customer.model.dto.request.AddressBookPageQueryReqDTO;
+import com.jzo2o.customer.model.dto.request.AddressBookUpsertReqDTO;
 import com.jzo2o.customer.service.IAddressBookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -25,5 +24,11 @@ public class AddressBookController {
     @ApiOperation("查询用户的地址")
     public PageResult<AddressBookResDTO> page(AddressBookPageQueryReqDTO addressBookPageQueryReqDTO) {
         return addressBookService.page(addressBookPageQueryReqDTO);
+    }
+
+    @PostMapping
+    @ApiOperation("新增用户的地址")
+    public void add(@RequestBody AddressBookUpsertReqDTO addressBookUpsertReqDTO) {
+        addressBookService.add(addressBookUpsertReqDTO);
     }
 }
