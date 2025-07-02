@@ -162,6 +162,18 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
 
     }
 
+    @Override
+    public AddressBook getDefaultAddressBook() {
+        AddressBook addressBook = lambdaQuery()
+                .eq(AddressBook::getUserId, UserContext.currentUserId())
+                .one();
+
+        if(addressBook == null) {
+            throw new CommonException("没有默认地址");
+        }
+        return addressBook;
+    }
+
     private void updateDefault(Long userId, int i) {
         Integer count = lambdaQuery()
                 .eq(AddressBook::getUserId, userId)

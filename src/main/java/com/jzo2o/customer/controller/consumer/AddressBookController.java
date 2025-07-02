@@ -61,4 +61,10 @@ public class AddressBookController {
                                    @NotNull(message = "flag不能为空") @RequestParam("flag") Integer flag) {
         addressBookService.defaultAddressBook(id,flag);
     }
+
+    @GetMapping("/defaultAddress")
+    @ApiOperation("获取用户的默认地址")
+    public void getDefaultAddressBook() {
+        addressBookService.getDefaultAddressBook();
+    }
 }
