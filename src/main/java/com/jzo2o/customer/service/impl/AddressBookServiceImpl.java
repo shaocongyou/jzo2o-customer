@@ -133,6 +133,35 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
         return BeanUtils.toBean(addressBook, AddressBookResDTO.class);
     }
 
+    @Override
+    public void defaultAddressBook(Long id, Integer flag) {
+        // 如果flag为1，表示设置为默认地址，否则表示取消默认地址
+        if(flag == 1) {
+            // 将目前该用户的地址全部取消默认
+            updateDefault(UserContext.currentUserId(), 0);
+            // 针对该地址设置成默认
+            boolean success = lambdaUpdate()
+                    .eq(AddressBook::getId, id)
+                    .set(AddressBook::getIsDefault, 1)
+                    .update();
+            if(!success) {
+                throw new CommonException("更新默认地址失败");
+            }
+        }else if(flag == 0) {
+            // 将目前该用户的地址全部取消默认
+            boolean success = lambdaUpdate()
+                    .eq(AddressBook::getId, id)
+                    .set(AddressBook::getIsDefault, 0)
+                    .update();
+            if(!success) {
+                throw new CommonException("取消默认地址失败");
+            }
+        }else {
+            throw new CommonException("flag参数错误");
+        }
+
+    }
+
     private void updateDefault(Long userId, int i) {
         Integer count = lambdaQuery()
                 .eq(AddressBook::getUserId, userId)

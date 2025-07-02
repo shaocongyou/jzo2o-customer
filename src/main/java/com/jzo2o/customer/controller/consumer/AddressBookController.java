@@ -7,11 +7,14 @@ import com.jzo2o.customer.model.domain.AddressBook;
 import com.jzo2o.customer.model.dto.request.AddressBookPageQueryReqDTO;
 import com.jzo2o.customer.model.dto.request.AddressBookUpsertReqDTO;
 import com.jzo2o.customer.service.IAddressBookService;
+import io.lettuce.core.dynamic.annotation.Param;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController("consumerAddressBookController")
 @RequestMapping("/consumer/address-book")
@@ -44,5 +47,18 @@ public class AddressBookController {
     @ApiOperation("修改用户的地址")
     public AddressBookResDTO updateById(@PathVariable Long id,@RequestBody AddressBookUpsertReqDTO addressBookUpsertReqDTO) {
         return addressBookService.updateById(id,addressBookUpsertReqDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiOperation("删除用户的地址")
+    public void deleteById(@NotNull(message = "删除列表不能为空") @RequestBody List<Long> ids) {
+        addressBookService.removeByIds(ids);
+    }
+
+    @PutMapping("/default")
+    @ApiOperation("设置用户的默认地址")
+    public void defaultAddressBook(@NotNull(message = "id不能为空") @RequestParam("id") Long id,
+                                   @NotNull(message = "flag不能为空") @RequestParam("flag") Integer flag) {
+        addressBookService.defaultAddressBook(id,flag);
     }
 }
