@@ -101,6 +101,38 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
         baseMapper.insert(addressBook);
     }
 
+    @Override
+    @Transactional
+    public AddressBookResDTO updateById(Long id, AddressBookUpsertReqDTO addressBookUpsertReqDTO) {
+        AddressBook addressBook = BeanUtil.toBean(addressBookUpsertReqDTO, AddressBook.class);
+        addressBook.setId(id);
+
+        //调用第三方，根据地址获取经纬度坐标
+        String completeAddress = addressBookUpsertReqDTO.getProvince() +
+                addressBookUpsertReqDTO.getCity() +
+                addressBookUpsertReqDTO.getCounty() +
+                addressBookUpsertReqDTO.getAddress();
+        //远程请求高德获取经纬度
+        LocationResDTO locationDto = mapApi.getLocationByAddress(completeAddress);
+        //经纬度(字符串格式：经度,纬度),经度在前，纬度在后
+        String location = locationDto.getLocation();
+        if(StringUtils.isNotEmpty(location)) {
+            // 经度
+            addressBook.setLon(NumberUtils.parseDouble(locationDto.getLocation().split(",")[0]));
+            // 纬度
+            addressBook.setLat(NumberUtils.parseDouble(locationDto.getLocation().split(",")[1]));
+        }
+
+        if(addressBookUpsertReqDTO.getIsDefault() == 1) {
+            // 如果是默认地址，需要把目前的所有地址设置为非默认
+            updateDefault(UserContext.currentUserId(), 0);
+        }
+
+        baseMapper.updateById(addressBook);
+
+        return BeanUtils.toBean(addressBook, AddressBookResDTO.class);
+    }
+
     private void updateDefault(Long userId, int i) {
         Integer count = lambdaQuery()
                 .eq(AddressBook::getUserId, userId)

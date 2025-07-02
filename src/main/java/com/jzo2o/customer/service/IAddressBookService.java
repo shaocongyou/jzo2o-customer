@@ -31,4 +31,6 @@ public interface IAddressBookService extends IService<AddressBook> {
     PageResult<AddressBookResDTO> page(AddressBookPageQueryReqDTO addressBookPageQueryReqDTO);
 
     void add(AddressBookUpsertReqDTO addressBookUpsertReqDTO);
+
+    AddressBookResDTO updateById(Long id, AddressBookUpsertReqDTO addressBookUpsertReqDTO);
 }

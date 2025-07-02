@@ -39,4 +39,10 @@ public class AddressBookController {
         AddressBook addressBook = addressBookService.getById(id);
         return BeanUtil.toBean(addressBook, AddressBookResDTO.class);
     }
+
+    @PutMapping("/{id}")
+    @ApiOperation("修改用户的地址")
+    public AddressBookResDTO updateById(@PathVariable Long id,@RequestBody AddressBookUpsertReqDTO addressBookUpsertReqDTO) {
+        return addressBookService.updateById(id,addressBookUpsertReqDTO);
+    }
 }
