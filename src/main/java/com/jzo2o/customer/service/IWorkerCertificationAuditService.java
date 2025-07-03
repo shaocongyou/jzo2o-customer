@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jzo2o.customer.model.dto.request.CertificationAuditReqDTO;
 import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditAddReqDTO;
 import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditPageQueryReqDTO;
+import com.jzo2o.customer.model.dto.response.RejectReasonResDTO;
 import com.jzo2o.customer.model.dto.response.WorkerCertificationAuditResDTO;
 
 /**
@@ -23,4 +24,6 @@ public interface IWorkerCertificationAuditService extends IService<WorkerCertifi
     PageResult<WorkerCertificationAuditResDTO> pageQuery(WorkerCertificationAuditPageQueryReqDTO workerCertificationAuditPageQueryReqDTO);
 
     void auditCertification(Long id, CertificationAuditReqDTO certificationAuditReqDTO);
+
+    RejectReasonResDTO queryCurrentUserLastRejectReason();
 }

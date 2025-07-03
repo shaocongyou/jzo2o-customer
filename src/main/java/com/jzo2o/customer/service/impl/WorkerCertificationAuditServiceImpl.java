@@ -18,6 +18,7 @@ import com.jzo2o.customer.model.dto.WorkerCertificationUpdateDTO;
 import com.jzo2o.customer.model.dto.request.CertificationAuditReqDTO;
 import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditAddReqDTO;
 import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditPageQueryReqDTO;
+import com.jzo2o.customer.model.dto.response.RejectReasonResDTO;
 import com.jzo2o.customer.model.dto.response.WorkerCertificationAuditResDTO;
 import com.jzo2o.customer.service.IServeProviderService;
 import com.jzo2o.customer.service.IWorkerCertificationAuditService;
@@ -119,6 +120,16 @@ public class WorkerCertificationAuditServiceImpl extends ServiceImpl<WorkerCerti
             workerCertificationUpdateDTO.setCertificationTime(workerCertificationAudit.getAuditTime());
         }
         workerCertificationService.updateById(workerCertificationUpdateDTO);
+    }
+
+    @Override
+    public RejectReasonResDTO queryCurrentUserLastRejectReason() {
+        LambdaQueryWrapper<WorkerCertificationAudit> queryWrapper = Wrappers.<WorkerCertificationAudit>lambdaQuery()
+                .eq(WorkerCertificationAudit::getServeProviderId, UserContext.currentUserId())
+                .orderByDesc(WorkerCertificationAudit::getCreateTime)
+                .last("limit 1");
+        WorkerCertificationAudit workerCertificationAudit = baseMapper.selectOne(queryWrapper);
+        return new RejectReasonResDTO(workerCertificationAudit.getRejectReason());
     }
 
 }
