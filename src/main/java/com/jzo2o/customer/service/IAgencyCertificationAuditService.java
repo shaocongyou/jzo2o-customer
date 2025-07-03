@@ -7,6 +7,7 @@ import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditAddReqDTO;
 import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditPageQueryReqDTO;
 import com.jzo2o.customer.model.dto.request.CertificationAuditReqDTO;
 import com.jzo2o.customer.model.dto.response.AgencyCertificationAuditResDTO;
+import com.jzo2o.customer.model.dto.response.RejectReasonResDTO;
 
 /**
  * <p>
@@ -23,4 +24,6 @@ public interface IAgencyCertificationAuditService extends IService<AgencyCertifi
     PageResult<AgencyCertificationAuditResDTO> pageQuery(AgencyCertificationAuditPageQueryReqDTO agencyCertificationAuditPageQueryReqDTO);
 
     void auditCertification(Long id, CertificationAuditReqDTO certificationAuditReqDTO);
+
+    RejectReasonResDTO queryCurrentUserLastRejectReason();
 }

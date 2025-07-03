@@ -20,6 +20,7 @@ import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditAddReqDTO;
 import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditPageQueryReqDTO;
 import com.jzo2o.customer.model.dto.request.CertificationAuditReqDTO;
 import com.jzo2o.customer.model.dto.response.AgencyCertificationAuditResDTO;
+import com.jzo2o.customer.model.dto.response.RejectReasonResDTO;
 import com.jzo2o.customer.service.IAgencyCertificationAuditService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.customer.service.IAgencyCertificationService;
@@ -117,5 +118,16 @@ public class AgencyCertificationAuditServiceImpl extends ServiceImpl<AgencyCerti
             agencyCertificationUpdateDTO.setCertificationTime(agencyCertificationAudit.getAuditTime());
         }
         agencyCertificationService.updateByServeProviderId(agencyCertificationUpdateDTO);
+    }
+
+    @Override
+    public RejectReasonResDTO queryCurrentUserLastRejectReason() {
+
+        LambdaQueryWrapper<AgencyCertificationAudit> queryWrapper = Wrappers.<AgencyCertificationAudit>lambdaQuery()
+                .eq(AgencyCertificationAudit::getServeProviderId, UserContext.currentUserId())
+                .orderByDesc(AgencyCertificationAudit::getCreateTime)
+                .last("limit 1");
+        AgencyCertificationAudit agencyCertificationAudit = baseMapper.selectOne(queryWrapper);
+        return new RejectReasonResDTO(agencyCertificationAudit.getRejectReason());
     }
 }
