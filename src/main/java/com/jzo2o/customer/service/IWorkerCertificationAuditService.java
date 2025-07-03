@@ -1,8 +1,12 @@
 package com.jzo2o.customer.service;
 
+import com.jzo2o.common.model.PageResult;
 import com.jzo2o.customer.model.domain.WorkerCertificationAudit;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jzo2o.customer.model.dto.request.CertificationAuditReqDTO;
 import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditAddReqDTO;
+import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditPageQueryReqDTO;
+import com.jzo2o.customer.model.dto.response.WorkerCertificationAuditResDTO;
 
 /**
  * <p>
@@ -15,4 +19,8 @@ import com.jzo2o.customer.model.dto.request.WorkerCertificationAuditAddReqDTO;
 public interface IWorkerCertificationAuditService extends IService<WorkerCertificationAudit> {
 
     void certificationAudit(WorkerCertificationAuditAddReqDTO workerCertificationAuditAddReqDTO);
+
+    PageResult<WorkerCertificationAuditResDTO> pageQuery(WorkerCertificationAuditPageQueryReqDTO workerCertificationAuditPageQueryReqDTO);
+
+    void auditCertification(Long id, CertificationAuditReqDTO certificationAuditReqDTO);
 }
