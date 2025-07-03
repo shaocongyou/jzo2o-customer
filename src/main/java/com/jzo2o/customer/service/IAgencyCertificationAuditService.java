@@ -5,6 +5,7 @@ import com.jzo2o.customer.model.domain.AgencyCertificationAudit;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditAddReqDTO;
 import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditPageQueryReqDTO;
+import com.jzo2o.customer.model.dto.request.CertificationAuditReqDTO;
 import com.jzo2o.customer.model.dto.response.AgencyCertificationAuditResDTO;
 
 /**
@@ -20,4 +21,6 @@ public interface IAgencyCertificationAuditService extends IService<AgencyCertifi
     void certificationAudit(AgencyCertificationAuditAddReqDTO agencyCertificationAuditAddReqDTO);
 
     PageResult<AgencyCertificationAuditResDTO> pageQuery(AgencyCertificationAuditPageQueryReqDTO agencyCertificationAuditPageQueryReqDTO);
+
+    void auditCertification(Long id, CertificationAuditReqDTO certificationAuditReqDTO);
 }
