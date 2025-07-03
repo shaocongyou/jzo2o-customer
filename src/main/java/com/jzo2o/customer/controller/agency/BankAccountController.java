@@ -1,4 +1,4 @@
-package com.jzo2o.customer.controller.worker;
+package com.jzo2o.customer.controller.agency;
 
 import com.jzo2o.customer.model.dto.request.BankAccountUpsertReqDTO;
 import com.jzo2o.customer.service.IBankAccountService;
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
-@RestController("workerBankAccountController")
-@RequestMapping("/worker/bank-account")
-@Api(tags = "服务端 - 银行账户相关接口")
+@RestController("agencyBankAccountController")
+@RequestMapping("/agency/bank-account")
+@Api(tags = "机构端 - 银行账户相关接口")
 public class BankAccountController {
 
     @Resource
