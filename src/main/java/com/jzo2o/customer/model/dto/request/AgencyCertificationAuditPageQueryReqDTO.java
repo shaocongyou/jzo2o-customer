@@ -1,6 +1,8 @@
 package com.jzo2o.customer.model.dto.request;
 
+import com.jzo2o.common.model.PageResult;
 import com.jzo2o.common.model.dto.PageQueryDTO;
+import com.jzo2o.customer.model.dto.response.AgencyCertificationAuditResDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -37,4 +39,5 @@ public class AgencyCertificationAuditPageQueryReqDTO extends PageQueryDTO {
      */
     @ApiModelProperty("认证状态，2：认证通过，3：认证失败")
     private Integer certificationStatus;
+
 }

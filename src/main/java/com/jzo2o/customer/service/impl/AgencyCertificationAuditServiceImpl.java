@@ -1,16 +1,22 @@
 package com.jzo2o.customer.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jzo2o.common.expcetions.CommonException;
+import com.jzo2o.common.model.PageResult;
 import com.jzo2o.common.utils.BeanUtils;
 import com.jzo2o.customer.model.domain.AgencyCertification;
 import com.jzo2o.customer.model.domain.AgencyCertificationAudit;
 import com.jzo2o.customer.mapper.AgencyCertificationAuditMapper;
-import com.jzo2o.customer.model.domain.WorkerCertification;
-import com.jzo2o.customer.model.domain.WorkerCertificationAudit;
 import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditAddReqDTO;
+import com.jzo2o.customer.model.dto.request.AgencyCertificationAuditPageQueryReqDTO;
+import com.jzo2o.customer.model.dto.response.AgencyCertificationAuditResDTO;
 import com.jzo2o.customer.service.IAgencyCertificationAuditService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.customer.service.IAgencyCertificationService;
+import com.jzo2o.mysql.utils.PageUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -54,5 +60,17 @@ public class AgencyCertificationAuditServiceImpl extends ServiceImpl<AgencyCerti
         if(!success){
             throw new CommonException("修改 机构认证信息 中的 认证状态 为 认证中 失败");
         }
+    }
+
+    @Override
+    public PageResult<AgencyCertificationAuditResDTO> pageQuery(AgencyCertificationAuditPageQueryReqDTO agencyCertificationAuditPageQueryReqDTO) {
+        Page<AgencyCertificationAudit> page = PageUtils.parsePageQuery(agencyCertificationAuditPageQueryReqDTO, AgencyCertificationAudit.class);
+        LambdaQueryWrapper<AgencyCertificationAudit> wrapper = Wrappers.<AgencyCertificationAudit>lambdaQuery()
+                .like(ObjectUtil.isNotEmpty(agencyCertificationAuditPageQueryReqDTO.getName()), AgencyCertificationAudit::getName, agencyCertificationAuditPageQueryReqDTO.getName())
+                .eq(ObjectUtil.isNotEmpty(agencyCertificationAuditPageQueryReqDTO.getLegalPersonName()), AgencyCertificationAudit::getLegalPersonName, agencyCertificationAuditPageQueryReqDTO.getLegalPersonName())
+                .eq(ObjectUtil.isNotEmpty(agencyCertificationAuditPageQueryReqDTO.getAuditStatus()), AgencyCertificationAudit::getAuditStatus, agencyCertificationAuditPageQueryReqDTO.getAuditStatus())
+                .eq(ObjectUtil.isNotEmpty(agencyCertificationAuditPageQueryReqDTO.getCertificationStatus()), AgencyCertificationAudit::getCertificationStatus, agencyCertificationAuditPageQueryReqDTO.getCertificationStatus());
+        Page<AgencyCertificationAudit> result = baseMapper.selectPage(page, wrapper);
+        return PageUtils.toPage(result, AgencyCertificationAuditResDTO.class);
     }
 }
